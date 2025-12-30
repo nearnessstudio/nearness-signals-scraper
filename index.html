@@ -1,1 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nearness Signals</title>
+  <style>
+    body { font-family: sans-serif; padding: 40px; }
+    select { margin-right: 10px; }
+    .signal { margin-bottom: 16px; }
+    .meta { color: #777; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<h1>Nearness Signals</h1>
+
+<select id="platformFilter">
+  <option value="">All platforms</option>
+  <option value="substack">Substack</option>
+  <option value="google_trends">Google Trends</option>
+  <option value="news">News</option>
+</select>
+
+<select id="categoryFilter">
+  <option value="">All categories</option>
+  <option value="home">Home</option>
+  <option value="fashion">Fashion</option>
+  <option value="culture">Culture</option>
+  <option value="lifestyle">Lifestyle</option>
+</select>
+
+<div id="signals"></div>
+
+<script>
+fetch("data/all_signals.json")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("signals");
+    const platformFilter = document.getElementById("platformFilter");
+    const categoryFilter = document.getElementById("categoryFilter");
+
+    function render() {
+      container.innerHTML = "";
+      data
+        .filter(s =>
+          (!platformFilter.value || s.platform === platformFilter.value) &&
+          (!categoryFilter.value || s.category === categoryFilter.value)
+        )
+        .forEach(s => {
+          container.innerHTML += `
+            <div class="signal">
+              <div><strong>${s.text}</strong></div>
+              <div class="meta">${s.platform} · ${s.category}</div>
+              <a href="${s.url}" target="_blank">Source</a>
+            </div>
+          `;
+        });
+    }
+
+    platformFilter.onchange = render;
+    categoryFilter.onchange = render;
+    render();
+  });
+</script>
+
+</body>
+</html>
 
