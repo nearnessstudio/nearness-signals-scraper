@@ -1,0 +1,27 @@
+name: Update signals daily
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # 8am CET = 7am UTC
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: pip install pandas feedparser pytrends
+
+      - run: python script/build_signals.py
+
+      - run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/all_signals.json
+          git commit -m "Daily signals update" || echo "No changes"
+          git push
